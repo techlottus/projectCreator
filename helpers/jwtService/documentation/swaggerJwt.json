@@ -1,0 +1,74 @@
+{ 
+  "swagger": "2.0", 
+  "info": { 
+    "version": "1.0.0",
+    "title": "JWT-TOKEN", 
+    "description": "JWT-TOKEN"
+  }, 
+  "host": "localhost:5000", 
+  "basePath" : "/",
+
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/api/jwt/" : {
+            "post":{
+                "consumes": ["application/json"],
+                "tags": ["jwt"],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Generate JWT Token",
+                        "required": true,
+                        "schema": { "type": "object", "example":  {
+                            "payload": {
+                              "user_id": 1,
+                              "user_email": "lewleal@zeleri.com",
+                              "active": true
+                            },
+                            "expires": true,  
+                            "expiresIn": 50
+                        } }                 
+                    }                   
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/jwt/validate":{
+            "post":{
+                "tags": ["Authorization"],
+                "sumary": "Validate JWT Token",
+                "parameters":   
+                [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization",
+                        "type": "string",
+                        "default": "Bearer "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+               
+            }
+
+        }
+    }
+
+}

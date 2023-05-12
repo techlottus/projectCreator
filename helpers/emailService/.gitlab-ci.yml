@@ -1,0 +1,50 @@
+# Include generic pipeline with stages: build -> validate -> image-build -> deploy
+# jobs are: build, sonar-validate, ecr_repo, image-build, image-tag, deploy-dev, deploy-qa
+# We only define jobs here to override their properties
+
+include:
+  - project: utils/Pipeline-Script
+    ref: master
+    file: k8s/generic-ionix.yml
+
+# These two variables define 'k8s/generic-ionix.yml' behavior
+variables:
+  IONIX_PRODUCT_NAME: zeleri2
+  IONIX_PROJECT_NAME: email-helper
+  SQ_PROJECT_KEY: zeleri-email-helper
+  SQ_PROJECT_NAME: "Zeleri Email Helper"
+
+
+# Overrive build job
+build:
+  image: "node:16.17.0"
+  script:
+    - "npm install"
+    - "npm run test"
+    - "npm run sonar"
+
+# Override image-build job
+image-build:
+  only:
+    - develop
+  when: on_success
+
+# Override deploy-dev job
+deploy-dev:
+  variables:
+    HELM_CHART_NAME: "ionix/zeleri-app"
+    HELM_CHART_VERSION: "1.1.0"
+  only:
+    - develop
+  when: on_success
+
+# Override deploy-qa job
+deploy-qa:
+  variables:
+    HELM_CHART_NAME: "ionix/zeleri-app"
+    HELM_CHART_VERSION: "1.1.0"
+  only:
+    - /^qa\/.*/
+  when: on_success
+  except:
+    - branches

@@ -1,0 +1,16 @@
+.devcontainer/
+.git/
+.dockerignore
+coverage/
+node_modules/
+sonar/
+test/
+.dockerignore
+.env
+.env.example
+.gitignore
+.gitlab-ci.yml
+Dockerfile
+jest.config.js
+*postman*
+package-lock.json

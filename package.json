@@ -1,0 +1,32 @@
+{
+  "name": "@lottus/dev.project",
+  "version": "1.1.26",
+  "description": "Generador de proyecto para uso interno Lottus",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/techlottus/projectCreator.git"
+  },
+  "bin": {
+    "dev.createproject": "./index.js",
+    "dev.helpers": "./helpers.js"
+  },
+  "author": "JAG",
+  "license": "MIT",
+  "dependencies": {
+    "@azure/msal-node": "^1.14.2",
+    "axios": "^1.1.3",
+    "chalk": "^5.1.2",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.8",
+    "inquirer": "^9.1.3",
+    "shelljs": "^0.8.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

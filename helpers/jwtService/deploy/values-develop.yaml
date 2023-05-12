@@ -1,0 +1,101 @@
+global:
+  enabled: true
+  projectName: "jwt-helper"
+  clusterName: "ionix-dev"
+  image:
+    repository: "141893973828.dkr.ecr.us-east-1.amazonaws.com/zeleri2-jwt-helper"
+    tag: latest
+    pullPolicy: Always
+
+  # Namespace where release will be deployed
+  namespace: "zeleri2-dev"
+
+app:
+  enabled: true
+  replicaCount: 1
+  externalSecrets:
+    enabled: true
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 1000m
+
+  nodeSelector: null
+
+  environment:
+    - name: ENV
+      value: dev
+    - name: PORT
+      value: "3000"
+    - name: JWT_ALGORITHM
+      value: "HS256"
+    - name: JWT_EXPIRES_IN
+      value: "15m"
+
+  # Configure the livenessProbe just TCP for now and readinessProbe just HTTP for now
+  livenessProbe:
+    enabled: false
+    type: tcp
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+  readinessProbe:
+    enabled: false
+    type: http
+    path: /
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+  # Enable and configure security context of deployment. Just runAsUser and runAsGroup are defined
+  securityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 11
+    targetCPUUtilizationPercentage: 50
+    targetMemoryUtilizationPercentage: 50
+
+  terminationGracePeriodSeconds: 300
+
+  ## Allowing use of ingress controllers
+  ingress:
+    enabled: true
+    labels: {}
+    ingressClassName:
+    annotations: |
+      kubernetes.io/ingress.class: ingress-internal
+      nginx.ingress.kubernetes.io/client-body-buffer-size: 75m
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: '30'
+      nginx.ingress.kubernetes.io/proxy-send-timeout: '30'
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    hosts:
+      - host: zeleri.dev.ionix.cl
+        paths:
+          - /jwt-helper(/|$)(.*)
+    tls:
+      enabled: true
+
+  # Enables a headless service to be used by
+  service:
+    enabled: true
+    # Port on which php server is listening
+    port: 3000
+    # Target port to which the service should be mapped to
+    targetPort: 3000
+
+
+migrations:
+  enabled: false
+  command: "npx migrate"
+ 
+cronjobs:
+  jobs: []

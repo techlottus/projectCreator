@@ -1,0 +1,113 @@
+global:
+  enabled: true
+  projectName: "user-orchestrator"
+  clusterName: "ionix-dev"
+  image:
+    repository: "141893973828.dkr.ecr.us-east-1.amazonaws.com/zeleri2-user-orchestrator"
+    tag: latest
+    pullPolicy: Always
+
+  # Namespace where release will be deployed
+  namespace: "zeleri2-qa"
+
+app:
+  enabled: true
+  replicaCount: 1
+  externalSecrets:
+    enabled: true
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 1000m
+
+  nodeSelector: null
+
+  environment:
+    - name: ENV
+      value: dev
+    - name: PORT
+      value: "3000"
+    - name:  API_JWT
+      value: https://localhost/api/jwt
+    - name: API_USER_DOMAIN
+      value: https://localhost/api/users
+    - name: SINACOFI_TOKEN
+      value: eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBMV81In0.eLEzHF_DWxTqeHhFNVOQR6IgQWQpfqEcRopagJc2qJJO3c3rsd1vtY31DnkoVkwictQw8MQZclxtB4_mxSl9ifT7EM6DLi3tCL0OG1UJ2-Lj2CnlIojlP75WXJgP0Dz6BBRiNkllCUPxliQPTFHTiWcEAn7XMmSVKwADx9og7kdmnzfrqSRHqjurI2GLd-6cBvlPhr8pip10ewqm8b4rM2pL0Xfsp6zBCppfpHyVGwYICS2cJL2awsq6Y4QmNJ_lHbK3djZ6_zVhrboEozXBrnzmMQcqeQ_Isqs7LO9Hg71rZhEsveFMlcf6zdgQuUOVVT0HmxGUhBMCiIKoO8s39w.aHz1EdL0oo1BOied61jwHA.Q4OWif1xza2I2nDyzvAHxQ.a2rcaUwSUeuTinN4Oc17eg
+    - name: SINACOFI_BASE_URL_DEV
+      value: https://testws.sinacofi.cl
+    - name: SINACOFI_BASE_URL_PROD
+      value: https://ws.sinacofi.cl
+    - name : APPROVAL_PERCENTAGE
+      value: "50"
+    - name: JWT_HELPER_URL
+      value: "0.0.0.0:5000"
+    - name: USERS_DOMAIN_URL
+      value: "0.0.0.0:4000"
+
+  # Configure the livenessProbe just TCP for now and readinessProbe just HTTP for now
+  livenessProbe:
+    enabled: false
+    type: tcp
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+  readinessProbe:
+    enabled: false
+    type: http
+    path: /
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+  # Enable and configure security context of deployment. Just runAsUser and runAsGroup are defined
+  securityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 11
+    targetCPUUtilizationPercentage: 50
+    targetMemoryUtilizationPercentage: 50
+
+  terminationGracePeriodSeconds: 300
+
+  ## Allowing use of ingress controllers
+  ingress:
+    enabled: true
+    labels: {}
+    ingressClassName:
+    annotations: |
+      kubernetes.io/ingress.class: ingress-internal
+      nginx.ingress.kubernetes.io/client-body-buffer-size: 75m
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: '30'
+      nginx.ingress.kubernetes.io/proxy-send-timeout: '30'
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    hosts:
+      - host: zeleri.dev.ionix.cl
+        paths:
+          - /user-orchestrator(/|$)(.*)
+    tls:
+      enabled: true
+
+  # Enables a headless service to be used by
+  service:
+    enabled: true
+    # Port on which php server is listening
+    port: 3000
+    # Target port to which the service should be mapped to
+    targetPort: 3000
+
+
+migrations:
+  enabled: false
+  command: "npx migrate"
+ 
+cronjobs:
+  jobs: []

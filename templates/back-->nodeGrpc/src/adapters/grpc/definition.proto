@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package packageDefinition;
+
+service Definition {
+    rpc createBook(CreateBookRequest) returns (CreateBookResponse);
+    rpc getBook(BookId) returns (BookDetail);
+    rpc getBooks(Empty) returns (BooksList);
+}
+
+message Empty {}
+
+message BookId {
+    uint64 id = 1;
+}
+
+message CreateBookRequest {
+    string title = 1;
+    string isbn = 2;
+    uint32 categoryId = 3;
+}
+
+message CreateBookResponse {
+    uint64 id = 1;
+    string title = 2;
+    string isbn = 3;
+    uint64 categoryId = 4;
+}
+
+message BookDetail {
+    uint64 id = 1;
+    string title = 2;
+    string isbn = 3;
+    string category = 4;
+}
+
+message BooksList {
+    repeated BookDetail books = 1;
+}
